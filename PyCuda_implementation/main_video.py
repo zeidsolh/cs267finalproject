@@ -5,7 +5,7 @@ import Disparity as dis
 import compute_disparity_gpu
 import time
 
-vid_folder = "../data/videos/"
+vid_folder = "./data/videos/"
 file = "IMG_9036"
 
 left_cap = cv.VideoCapture("{}{}_Left.mp4".format(vid_folder, file))
@@ -27,8 +27,9 @@ ret_right, right_frame = right_cap.read()
 if not ret_left:
     print("No frame received from left video stream. Exiting...")
     exit()
-cv.imshow('Disparity Map Filtered', right_frame)
-width, height = left_frame.shape[:2] # output same dimensions as input left
+# cv.imshow('Disparity Map Filtered', right_frame)
+# width, height = left_frame.shape[:2] # output same dimensions as input left
+width, height = 3024, 4032
 out = cv.VideoWriter(output_filename, fourcc, framerate, (width, height))
 out_filtered = cv.VideoWriter(output_filtered_filename, fourcc, framerate, (width, height))
 
@@ -56,15 +57,19 @@ while True:
         print("No frames received from video streams. Exiting...")
         break
 
+    # left_frame = cv.imread('./data/pictures/DSC_0005_Left.jpeg')
+    # right_frame = cv.imread('./data/pictures/DSC_0005_Right.jpeg')
+
+    left_frame = cv.resize(left_frame, (width, height))
+    right_frame = cv.resize(right_frame, (width, height))
+    
     # Converting images into grayscale
     L_gray = cv.cvtColor(left_frame, cv.COLOR_BGR2GRAY)
     R_gray = cv.cvtColor(right_frame, cv.COLOR_BGR2GRAY)
-
+    
     # Pre-processing by mean adjusting the images
     L_gray = L_gray - np.mean(L_gray)
     R_gray = R_gray - np.mean(R_gray)
-
-    print("Starting now")
 
     # Select block size over here 
     block_size = [9, 9]
@@ -78,7 +83,12 @@ while True:
     # D_map = dis.compute_disparity_map(L_gray, R_gray, block_size)
 
     # Call to GPU function
-    D_map = host_code.compute_disparity_gpu(L_gray, R_gray, block_size)
+    # print(type(L_gray))
+    # print(L_gray.shape)
+    # print(type(R_gray))
+    # print(R_gray.shape)
+    # print("frames_processed", frames_processed)
+    D_map = compute_disparity_gpu.compute_disparity_gpu(L_gray, R_gray, block_size)
 
     # Smoothening the result by passing it through a median filter
     D_map_filtered = cv.medianBlur(D_map, 13)
@@ -96,12 +106,12 @@ while True:
         fps_text = "FPS: {}".format(int(fps))
         cv.putText(D_map_filtered, fps_text, (10, 30), font, 1, (0, 0, 255), 2)
 
-    print("Time taken:", elapsed_time, "seconds") # todo remove to reduce IO
-
+    # print("Time taken:", elapsed_time, "seconds") # todo remove to reduce IO
+    cv.imwrite('./data/temp.png', D_map)
     # Write the disparity frame to the output video
     out.write(D_map)
     out_filtered.write(D_map_filtered)
-
+    break
     # Show the disparity map (optional)
     # cv.imshow('Disparity Map Filtered', D_map_filtered)
     # cv.waitKey(1)  # Adjust wait time as needed

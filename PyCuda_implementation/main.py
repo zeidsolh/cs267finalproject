@@ -2,11 +2,11 @@ import numpy as np
 import cv2 as cv 
 import math
 import Disparity as dis
-import host_code
+import compute_disparity_gpu
 import time
 
-L = cv.imread('./data/left.jpg')
-R = cv.imread('./data/right.jpg')
+L = cv.imread('./data/pictures/DSC_0005_Left.jpeg')
+R = cv.imread('./data/pictures/DSC_0005_Right.jpeg')
 
 # Converting images into grayscale
 L_gray = cv.cvtColor(L, cv.COLOR_BGR2GRAY)
@@ -29,7 +29,9 @@ block_size = [9, 9]
 start_time = time.time()
 
 # Call to GPU function
-D_map = host_code.compute_disparity_gpu(L_gray, R_gray, block_size)
+print(type(L_gray))
+print(L_gray.shape)
+D_map = compute_disparity_gpu.compute_disparity_gpu(L_gray, R_gray, block_size)
 
 # Measure end time
 end_time = time.time()
