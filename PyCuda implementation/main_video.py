@@ -1,46 +1,92 @@
 import numpy as np 
 import cv2 as cv 
 import math
-import Disparity as dis
+# import Disparity as dis
 import host_code
 import time
 
-L = cv.imread('./data/left.jpg')
-R = cv.imread('./data/right.jpg')
+vid_folder = "../data/videos/"
+file = "IMG_9036_"
 
-# Converting images into grayscale
-L_gray = cv.cvtColor(L, cv.COLOR_BGR2GRAY)
-R_gray = cv.cvtColor(R, cv.COLOR_BGR2GRAY)
+left_cap = cv.VideoCapture(f"{vid_folder}{file}_Left.mp4")
+right_cap = cv.VideoCapture(f"{vid_folder}{file}_Right.mp4")
+output_filename = f"{vid_folder}{file}_disparity_output.avi"
+output_filtered_filename = f"{vid_folder}{file}_disparity_filtered_output.avi"
+framerate = 20.0 # todo: calculated value from run speed
 
-# Pre-processing by mean adjusting the images
-L_gray = L_gray - np.mean(L_gray)
-R_gray = R_gray - np.mean(R_gray)
+# Define video writer object for disparity output
+fourcc = cv.VideoWriter_fourcc(*'XVID')  # video format
 
-print("Starting now")
+# read in first frame of each side to use for output shape
+ret_left, left_frame = left_cap.read()
+ret_right, right_frame = right_cap.read()
+width, height = right_frame.read().shape[:2] # output same dimensions as input left
+out = cv.VideoWriter(output_filename, fourcc, framerate, (width, height))
+out_filtered = cv.VideoWriter(output_filtered_filename, fourcc, framerate, (width, height))
 
-# Select block size over here 
-block_size = [9, 9]
+# Check if video captures are opened successfully
+if not left_cap.isOpened() or not right_cap.isOpened():
+    print("Error opening video streams or files")
 
-# Call to CPU function 
-# Un-comment this next line to run the code on the CPU
-# D_map = dis.compute_disparity_map(L_gray, R_gray, block_size)
+print("Starting video processing...")
 
-# Measure start time
-start_time = time.time()
+# Loop through each frame of the video
+while True:
+    # get frame
+    ret_left, left_frame = left_cap.read()
+    ret_right, right_frame = right_cap.read()
 
-# Call to GPU function
-D_map = host_code.compute_disparity_gpu(L_gray, R_gray, block_size)
+    # Check if frames are read correctly
+    if not ret_left or not ret_right:
+        print("No frames received from video streams. Exiting...")
+        break
 
-# Measure end time
-end_time = time.time()
+    # Converting images into grayscale
+    L_gray = cv.cvtColor(left_frame, cv.COLOR_BGR2GRAY)
+    R_gray = cv.cvtColor(right_frame, cv.COLOR_BGR2GRAY)
 
-# Calculate elapsed time
-elapsed_time = end_time - start_time
-print("Time taken:", elapsed_time, "seconds")
+    # Pre-processing by mean adjusting the images
+    L_gray = L_gray - np.mean(L_gray)
+    R_gray = R_gray - np.mean(R_gray)
 
-# Smoothening the result by passing it through a median filter
-D_map_filtered = cv.medianBlur(D_map, 13)
+    print("Starting now")
 
-# Saving the raw and filtered disparity map
-cv.imwrite('./data/raw_disparity.png', D_map)
-cv.imwrite('./data/filtered_disparity.png', D_map_filtered)
+    # Select block size over here 
+    block_size = [9, 9]
+
+    # Call to CPU function 
+    # Un-comment this next line to run the code on the CPU
+    # D_map = dis.compute_disparity_map(L_gray, R_gray, block_size)
+
+    # Measure start time
+    start_time = time.time()
+
+    # Call to GPU function
+    D_map = host_code.compute_disparity_gpu(L_gray, R_gray, block_size)
+
+    # Measure end time
+    end_time = time.time()
+
+    # Calculate elapsed time
+    elapsed_time = end_time - start_time
+    print("Time taken:", elapsed_time, "seconds")
+
+    # Smoothening the result by passing it through a median filter
+    D_map_filtered = cv.medianBlur(D_map, 13)
+
+    # Write the disparity frame to the output video
+    out.write(D_map)
+    out_filtered.write(D_map_filtered)
+
+    # Show the disparity map (optional)
+    # cv.imshow('Disparity Map Filtered', D_map_filtered)
+    # cv.waitKey(1)  # Adjust wait time as needed
+
+# Release resources
+left_cap.release()
+right_cap.release()
+out.release()
+out_filtered.release()
+cv.destroyAllWindows()
+
+print("Video processing complete!")
