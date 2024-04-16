@@ -2,16 +2,16 @@ import numpy as np
 import cv2 as cv 
 import math
 import Disparity as dis
-import host_code
+import compute_disparity_gpu
 import time
 
 vid_folder = "../data/videos/"
 file = "IMG_9036"
 
-left_cap = cv.VideoCapture(f"{vid_folder}{file}_Left.mp4")
-right_cap = cv.VideoCapture(f"{vid_folder}{file}_Right.mp4")
-output_filename = f"{vid_folder}output/{file}_disparity_output.avi"
-output_filtered_filename = f"{vid_folder}output/{file}_disparity_filtered_output.avi"
+left_cap = cv.VideoCapture("{}{}_Left.mp4".format(vid_folder, file))
+right_cap = cv.VideoCapture("{}{}_Right.mp4".format(vid_folder, file))
+output_filename = "{}output/{}_disparity_output.avi".format(vid_folder, file)
+output_filtered_filename = "{}output/{}_disparity_filtered_output.avi".format(vid_folder, file)
 framerate = 20.0 # todo: calculated value from run speed
 
 # Check if video captures are opened successfully
@@ -93,7 +93,7 @@ while True:
         start_time = current_time
 
         # Put FPS text on the frame
-        fps_text = f"FPS: {int(fps)}"
+        fps_text = "FPS: {}".format(int(fps))
         cv.putText(D_map_filtered, fps_text, (10, 30), font, 1, (0, 0, 255), 2)
 
     print("Time taken:", elapsed_time, "seconds") # todo remove to reduce IO
