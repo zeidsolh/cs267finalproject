@@ -1,0 +1,15 @@
+High Resolution,,,,,,,,Low Resolution,,,,,
+Parallelization,Simulations,Read + Setup,Computation Time,Write,Total Time (ms),,,Parallelization,Simulations,Read + Setup,Computation Time,Write,Total Time
+Cuda,100 Sims,206,6180,1234,7621,,,Cuda,100 Sims,72,1590,122,1786
+Cuda,1000 Sims,228,51493,1514,53237,,,Cuda,1000 Sims,172,4484,70,4727
+Cuda,10000 Sims,204,502737,1327,504269,,,Cuda,10000 Sims,52,33710,66,33830
+,,,,,,,,,,,,,
+CudaSIMD,100 Sims,757,5819,905,7482,,,CudaSIMD,100 Sims,59,1516,354,1930
+CudaSIMD,1000 Sims,575,47172,1214,48962,,,CudaSIMD,1000 Sims,37,4165,105,4308
+CudaSIMD,10000 Sims,233,463933,935,465101,,,CudaSIMD,10000 Sims,66,31657,64,31788
+,,,,,,,,,,,,,
+OpenMP 128,100 Sims,273,72488,1687,74449,,,OpenMP 128,100 Sims,128,3037,61,3227
+OpenMP 128,1000 Sims,203,641481,1278,642964,,,OpenMP 128,1000 Sims,83,33744,65,33894
+,,,,,,,,,,,,,
+OpenMP SIMD 128,100 Sims,218,21840,1081,23140,,,OpenMP SIMD 128,100 Sims,119,1346,302,1768
+OpenMP SIMD 128,1000 Sims,214,213546,887,214648,,,OpenMP SIMD 128,1000 Sims,39,14109,60,14209

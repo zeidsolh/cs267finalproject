@@ -1,0 +1,5 @@
+,Threads,Read + Setup,Computation Time,Write,Total Time,Name,,Time (ms)
+,1,206,1207,931,2344,High-Resolution,,2099
+,,,,,,,,
+Small,Number of Threads,,,,,,,Time (ms)
+,1,38,1168,64,1271,Low-Resolution,,1258

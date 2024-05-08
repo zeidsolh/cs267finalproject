@@ -1,0 +1,41 @@
+Single threaded,Single Threaded SIMD,OpenMP 64,OpenMPSIMD 64,CUDA ,CUDASIMD
+Generating disparity image with the following parameters:,Generating disparity image with the following parameters:,,,,
+Algorithm Name: SingleThreaded.,Algorithm Name: SingleThreadedSimd.,,,,
+Block Size: 7.,Block Size: 7.,,,,
+Left Scan Steps: 50.,Left Scan Steps: 50.,,,,
+Right Scan Steps: 50.,Right Scan Steps: 50.,,,,
+Disparity Metric: SUM_ABSOLUTE_DIFFERENCE.,Disparity Metric: SUM_ABSOLUTE_DIFFERENCE.,,,,
+Left Image: ./DSC_0010_Left-2.jpeg.,Left Image: ./DSC_0010_Left-2.jpeg.,,,,
+Right Image: ./DSC_0010_Right-2.jpeg.,Right Image: ./DSC_0010_Right-2.jpeg.,,,,
+Image Size: (750x1000).,Image Size: (750x1000).,,,,
+Output Path: disparity.png,Output Path: disparity.png,,,,
+Elapsed time: 6853 ms,Elapsed time: 5149 ms,,,,
+Average elapsed time per pixel: 9112.19 ns,Average elapsed time per pixel: 6840.56 ns,,,,
+Average SAD over block time: 6479 ns,Average SAD over block time: 4092 ns,,,,
+Computation complete. Generating output image...,Computation complete. Generating output image...,,,,
+Writing to disparity.png...,Writing to disparity.png...,,,,
+Graceful termination,Graceful termination,,,,
+Time taken to create disparity generator: 50 ms,Time taken to create disparity generator: 100 ms,,,,
+Time taken to compute disparity: 6853 ms,Time taken to compute disparity: 5149 ms,,,,
+Time taken to write output image: 65 ms,Time taken to write output image: 63 ms,,,,
+Total time taken: 6969 ms,Total time taken: 5313 ms,,,,
+,,,,,
+,,,,,
+Generating disparity image with the following parameters:,Generating disparity image with the following parameters:,Generating disparity image with the following parameters:,Generating disparity image with the following parameters:,Generating disparity image with the following parameters:,Generating disparity image with the following parameters:
+Algorithm Name: SingleThreaded.,Algorithm Name: SingleThreadedSimd.,Algorithm Name: OpenMp.,Algorithm Name: OpenMpSimd.,Algorithm Name: Cuda.,Algorithm Name: CudaSimd.
+Block Size: 7.,Block Size: 7.,Block Size: 7.,Block Size: 7.,Block Size: 7.,Block Size: 7.
+Left Scan Steps: 50.,Left Scan Steps: 50.,Left Scan Steps: 50.,Left Scan Steps: 50.,Left Scan Steps: 50.,Left Scan Steps: 50.
+Right Scan Steps: 50.,Right Scan Steps: 50.,Right Scan Steps: 50.,Right Scan Steps: 50.,Right Scan Steps: 50.,Right Scan Steps: 50.
+Disparity Metric: SUM_ABSOLUTE_DIFFERENCE.,Disparity Metric: SUM_ABSOLUTE_DIFFERENCE.,Disparity Metric: SUM_ABSOLUTE_DIFFERENCE.,Disparity Metric: SUM_ABSOLUTE_DIFFERENCE.,Disparity Metric: SUM_ABSOLUTE_DIFFERENCE.,Disparity Metric: SUM_ABSOLUTE_DIFFERENCE.
+Left Image: ./DSC_0010_Left-2.jpeg.,Left Image: ./DSC_0010_Left-2.jpeg.,Left Image: ./DSC_0010_Left-2.jpeg.,Left Image: ./DSC_0010_Left-2.jpeg.,Left Image: ./DSC_0010_Left-2.jpeg.,Left Image: ./DSC_0010_Left-2.jpeg.
+Right Image: ./DSC_0010_Right-2.jpeg.,Right Image: ./DSC_0010_Right-2.jpeg.,Right Image: ./DSC_0010_Right-2.jpeg.,Right Image: ./DSC_0010_Right-2.jpeg.,Right Image: ./DSC_0010_Right-2.jpeg.,Right Image: ./DSC_0010_Right-2.jpeg.
+Image Size: (750x1000).,Image Size: (750x1000).,Image Size: (750x1000).,Image Size: (750x1000).,Image Size: (750x1000).,Image Size: (750x1000).
+Output Path: disparity.png,Output Path: disparity.png,Output Path: disparity.png,Output Path: disparity.png,Output Path: disparity.png,Output Path: disparity.png
+Average time per pixel: 4739.71 ns,Average time per pixel: 1734.72 ns,Average time per pixel: 83.3714 ns,Average time per pixel: 40.7827 ns,Time per pixel: 52.245121 ns,Time per pixel: 24.468267 ns
+Computation complete. Generating output image...,Computation complete. Generating output image...,Computation complete. Generating output image...,Computation complete. Generating output image...,Computation complete. Generating output image...,Computation complete. Generating output image...
+Writing to disparity.png...,Writing to disparity.png...,Writing to disparity.png...,Writing to disparity.png...,Writing to disparity.png...,Writing to disparity.png...
+Graceful termination,Graceful termination,Graceful termination,Graceful termination,Graceful termination,Graceful termination
+Time taken to create disparity generator: 63 ms,Time taken to create disparity generator: 28 ms,Time taken to create disparity generator: 26 ms,Time taken to create disparity generator: 74 ms,Time taken to create disparity generator: 33 ms,Time taken to create disparity generator: 21 ms
+Time taken to compute disparity: 3554 ms,Time taken to compute disparity: 1301 ms,Time taken to compute disparity: 62 ms,Time taken to compute disparity: 30 ms,Time taken to compute disparity: 1242 ms,Time taken to compute disparity: 1194 ms
+Time taken to write output image: 76 ms,Time taken to write output image: 61 ms,Time taken to write output image: 62 ms,Time taken to write output image: 60 ms,Time taken to write output image: 63 ms,Time taken to write output image: 62 ms
+Total time taken: 3694 ms,Total time taken: 1391 ms,Total time taken: 152 ms,Total time taken: 165 ms,Total time taken: 1339 ms,Total time taken: 1279 ms

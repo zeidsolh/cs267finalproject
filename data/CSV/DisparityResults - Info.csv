@@ -1,0 +1,6 @@
+Berkeley Clock Tower,,,,,
+Image Size: (3024x4032).,,,,Small,Image Size: (750x1000).
+Block Size: 7.,,,,,
+Left Scan Steps: 50.,,,,,
+Right Scan Steps: 50.,,,,,
+Disparity Metric: SUM_ABSOLUTE_DIFFERENCE.,,,,,

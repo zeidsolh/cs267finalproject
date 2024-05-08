@@ -1,0 +1,38 @@
+O(image_size * bock_size * scanSteps),,Double scan steps,,Double Block Size,,x4 Block Size
+,,,,,,
+Generating disparity image with the following parameters:,,Generating disparity image with the following parameters:,,Generating disparity image with the following parameters:,,Generating disparity image with the following parameters:
+Algorithm Name: SingleThreaded.,,Algorithm Name: SingleThreaded.,,Algorithm Name: SingleThreaded.,,Algorithm Name: SingleThreaded.
+Block Size: 7.,,Block Size: 7.,,Block Size: 13.,,Block Size: 27.
+Left Scan Steps: 50.,,Left Scan Steps: 100.,,Left Scan Steps: 50.,,Left Scan Steps: 50.
+Right Scan Steps: 50.,,Right Scan Steps: 100.,,Right Scan Steps: 50.,,Right Scan Steps: 50.
+Disparity Metric: SUM_ABSOLUTE_DIFFERENCE.,,Disparity Metric: SUM_ABSOLUTE_DIFFERENCE.,,Disparity Metric: SUM_ABSOLUTE_DIFFERENCE.,,Disparity Metric: SUM_ABSOLUTE_DIFFERENCE.
+Left Image: ./DSC_0010_Left-2.jpeg.,,Left Image: ./DSC_0010_Left-2.jpeg.,,Left Image: ./DSC_0010_Left-2.jpeg.,,Left Image: ./DSC_0010_Left-2.jpeg.
+Right Image: ./DSC_0010_Right-2.jpeg.,,Right Image: ./DSC_0010_Right-2.jpeg.,,Right Image: ./DSC_0010_Right-2.jpeg.,,Right Image: ./DSC_0010_Right-2.jpeg.
+Image Size: (750x1000).,,Image Size: (750x1000).,,Image Size: (750x1000).,,Image Size: (750x1000).
+Output Path: disparity.png,,Output Path: disparity.png,,Output Path: disparity.png,,Output Path: disparity.png
+Computation complete. Generating output image...,,Computation complete. Generating output image...,,Computation complete. Generating output image...,,Computation complete. Generating output image...
+Writing to disparity.png...,,Writing to disparity.png...,,Writing to disparity.png...,,Writing to disparity.png...
+Graceful termination,,Graceful termination,,Graceful termination,,Graceful termination
+Time taken to create disparity generator: 32 ms,,Time taken to create disparity generator: 92 ms,,Time taken to create disparity generator: 268 ms,,Time taken to create disparity generator: 36 ms
+Time taken to compute disparity: 3506 ms,,Time taken to compute disparity: 6804 ms,,Time taken to compute disparity: 10705 ms,,Time taken to compute disparity: 22135 ms
+Time taken to write output image: 64 ms,,Time taken to write output image: 62 ms,,Time taken to write output image: 68 ms,,Time taken to write output image: 48 ms
+Total time taken: 3603 ms,,Total time taken: 6959 ms,,Total time taken: 11043 ms,,Total time taken: 22220 ms
+,,,,,,
+16 * Image Resolution,,/2 Scan Steps,,/2 Block size,,
+Generating disparity image with the following parameters:,,Generating disparity image with the following parameters:,,Generating disparity image with the following parameters:,,increase block size * x = increase time * 1.5 * x
+Algorithm Name: SingleThreaded.,,Algorithm Name: SingleThreaded.,,Algorithm Name: SingleThreaded.,,increase image reso * x = increase time * x
+Block Size: 7.,,Block Size: 7.,,Block Size: 3.,,increase scan steps * x = increase time * x
+Left Scan Steps: 50.,,Left Scan Steps: 25.,,Left Scan Steps: 50.,,
+Right Scan Steps: 50.,,Right Scan Steps: 25.,,Right Scan Steps: 50.,,
+Disparity Metric: SUM_ABSOLUTE_DIFFERENCE.,,Disparity Metric: SUM_ABSOLUTE_DIFFERENCE.,,Disparity Metric: SUM_ABSOLUTE_DIFFERENCE.,,
+Left Image: ./DSC_0010_Left.jpeg.,,Left Image: ./DSC_0010_Left-2.jpeg.,,Left Image: ./DSC_0010_Left-2.jpeg.,,
+Right Image: ./DSC_0010_Right.jpeg.,,Right Image: ./DSC_0010_Right-2.jpeg.,,Right Image: ./DSC_0010_Right-2.jpeg.,,
+Image Size: (3024x4032).,,Image Size: (750x1000).,,Image Size: (750x1000).,,
+Output Path: disparity.png,,Output Path: disparity.png,,Output Path: disparity.png,,
+Computation complete. Generating output image...,,Computation complete. Generating output image...,,Computation complete. Generating output image...,,
+Writing to disparity.png...,,Writing to disparity.png...,,Writing to disparity.png...,,
+Graceful termination,,Graceful termination,,Graceful termination,,
+Time taken to create disparity generator: 208 ms,,Time taken to create disparity generator: 102 ms,,Time taken to create disparity generator: 79 ms,,
+Time taken to compute disparity: 59116 ms,,Time taken to compute disparity: 1798 ms,,Time taken to compute disparity: 943 ms,,
+Time taken to write output image: 891 ms,,Time taken to write output image: 83 ms,,Time taken to write output image: 75 ms,,
+Total time taken: 60216 ms,,Total time taken: 1984 ms,,Total time taken: 1098 ms,,

@@ -1,0 +1,31 @@
+Original,,,,Block Size,Read + Setup,Computation Time,Write,Total Time
+Algorithm Name: SingleThreaded.,,,,1,155,325,66,548
+Block Size: 7.,,,,3,78,943,74,1096
+Left Scan Steps: 50.,,,,5,261,1996,65,2324
+Right Scan Steps: 50.,,,,7,100,3508,62,3671
+Disparity Metric: SUM_ABSOLUTE_DIFFERENCE.,,,,11,112,7839,59,8011
+Left Image: ./DSC_0010_Left-2.jpeg.,,,,17,87,3777,54,3919
+Right Image: ./DSC_0010_Right-2.jpeg.,,,,19,49,6891,53,6994
+Image Size: (750x1000).,,,,27,35,21855,49,21940
+Output Path: disparity.png,,,,37,22,19053,47,19123
+Computation complete. Generating output image...,,,,49,120,14052,40,14212
+Writing to disparity.png...,,,,75,42,65167,35,65245
+Graceful termination,,,,,,,,
+Time taken to create disparity generator: 392 ms,,,,Scan,Read + Setup,Computation Time,Write,Total Time
+Time taken to compute disparity: 3515 ms,,,,10,78,753,65,896
+Time taken to write output image: 63 ms,,,,20,34,1451,68,1554
+Total time taken: 3972 ms,,,,30,26,2143,71,2242
+,,,,50,26,3505,271,3803
+,,,,70,149,4846,69,5065
+,,,,90,34,6164,63,6261
+,,,,100,51,6811,67,6929
+,,,,120,30,8051,88,8170
+,,,,140,57,9314,60,9432
+,,,,150,41,9904,61,10007
+,,,,200,273,12845,59,13178
+,,,,,,,,
+,,,Name,Resolution,Read + Setup,Computation Time,Write,Total Time
+,,,375x500,187500,16,853,30,899
+,,,750x1000,750000,100,3514,289,3905
+,,,1500x2000,3000000,104,14239,535,14879
+,,,3024x4032,12192768,224,59282,1753,61260

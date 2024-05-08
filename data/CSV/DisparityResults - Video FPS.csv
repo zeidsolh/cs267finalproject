@@ -1,0 +1,20 @@
+OPENMP SIMD 128
+Average Time taken to create disparity generator: 217.496 ms
+Average Time taken to compute disparity: 26 ms
+Average Time taken to write output image: 57.7478 ms
+Average Total time per frame: 302.13 ms
+FPS: 3.30441
+Image Resolution: 1920x1080
+Total Time Elapsed: 34499.3509
+
+CUDA SIMD
+Average Time taken to create disparity generator: 231.365 ms
+Average Time taken to compute disparity: 19.9478 ms
+Average Time taken to write output image: 59.4957 ms
+Average Total time per frame: 312.33 ms
+FPS: 3.19693
+Total Time Elapsed: 35659.2106 ms
+
+
+114 images
+video rate 30fps

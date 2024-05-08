@@ -1,0 +1,21 @@
+,,,,,,,,,,,,,
+Cuda,,Read + Setup,Computation Time,Write,Total Time,,,Cuda,,Read + Setup,Computation Time,Write,Total Time
+100 Sims,,206,6180,1234,7621,,,100 Sims,,72,1590,122,1786
+1000 Sims,,228,51493,1514,53237,,,1000 sims,,172,4484,70,4727
+10000 Sims,,204,502737,1327,504269,,,10000 Sims,,52,33710,66,33830
+,,,,,,,,,,,,,
+CudaSIMD,,Read + Setup,Computation Time,Write,Total Time,,,CudaSIMD,,Read + Setup,Computation Time,Write,Total Time
+100 Sims,,757,5819,905,7482,,,100 Sims,,59,1516,354,1930
+1000 Sims,,575,47172,1214,48962,,,1000 sims,,37,4165,105,4308
+10000 Sims,,233,463933,935,465101,,,10000 Sims,,66,31657,64,31788
+,,,,,,,,,,,,,
+,,,,,,,,,,,,,
+OpenMP 128,,Read + Setup,Computation Time,Write,Total Time,,,OpenMP 128,,Read + Setup,Computation Time,Write,Total Time
+100 Sims,,273,72488,1687,74449,,,100 Sims,,128,3037,61,3227
+1000 Sims,,203,641481,1278,642964,,,1000 sims,,83,33744,65,33894
+,,,,,,,,,,,,,
+,,,,,,,,,,,,,
+,,,,,,,,,,,,,
+OpenMP SIMD 128,,Read + Setup,Computation Time,Write,Total Time,,,OpenMP SIMD 128,,Read + Setup,Computation Time,Write,Total Time
+100 Sims,,218,21840,1081,23140,,,100 Sims,,119,1346,302,1768
+1000 Sims,,214,213546,887,214648,,,1000 sims,,39,14109,60,14209
