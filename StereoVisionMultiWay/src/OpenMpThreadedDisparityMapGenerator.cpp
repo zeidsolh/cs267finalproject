@@ -1,30 +1,40 @@
 #include "../include/OpenMpThreadedDisparityMapGenerator.hpp"
-
 #include <iostream>
+#include <chrono>
 
 OpenMpThreadedDisparityMapGenerator::OpenMpThreadedDisparityMapGenerator(
-        const DisparityMapAlgorithmParameters_t& parameters)
-        : parameters_(parameters) {
+    const DisparityMapAlgorithmParameters_t &parameters)
+    : parameters_(parameters)
+{
     this->ensureParametersValid();
 }
 
 void OpenMpThreadedDisparityMapGenerator::setParameters(
-        const DisparityMapAlgorithmParameters_t& parameters) {
+    const DisparityMapAlgorithmParameters_t &parameters)
+{
     this->parameters_ = parameters;
     this->ensureParametersValid();
 }
 
-const DisparityMapAlgorithmParameters_t& OpenMpThreadedDisparityMapGenerator::getParameters() const {
+const DisparityMapAlgorithmParameters_t &OpenMpThreadedDisparityMapGenerator::getParameters() const
+{
     return this->parameters_;
 }
 
 void OpenMpThreadedDisparityMapGenerator::computeDisparity(
-        const cv::Mat& leftImage,
-        const cv::Mat& rightImage,
-        cv::Mat& disparity) {
-    #pragma omp parallel for collapse(2) default(none) shared(leftImage, rightImage, disparity)
-    for (int y = 0; y < disparity.rows; y++) {
-        for (int x = 0; x < disparity.cols; x++) {
+    const cv::Mat &leftImage,
+    const cv::Mat &rightImage,
+    cv::Mat &disparity)
+{
+
+    long long sumElapsedTimePixel = 0;
+    auto startTime = std::chrono::high_resolution_clock::now();
+
+#pragma omp parallel for collapse(2) schedule(dynamic, 10) default(none) shared(leftImage, rightImage, disparity) reduction(+ : sumElapsedTimePixel)
+    for (int y = 0; y < disparity.rows; y++)
+    {
+        for (int x = 0; x < disparity.cols; x++)
+        {
             disparity.at<float>(y, x) = computeDisparityForPixel(
                 y,
                 x,
@@ -32,31 +42,41 @@ void OpenMpThreadedDisparityMapGenerator::computeDisparity(
                 rightImage);
         }
     }
+    sumElapsedTimePixel = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - startTime).count();
+    long long totalPixels = disparity.rows * disparity.cols;
+    double averageElapsedTimePixel = static_cast<double>(sumElapsedTimePixel) / totalPixels;
+    std::cout << "Average time per pixel: " << averageElapsedTimePixel << " ns" << std::endl;
 }
 
-void OpenMpThreadedDisparityMapGenerator::ensureParametersValid() {
-    if (this->parameters_.blockSize < 0) {
+void OpenMpThreadedDisparityMapGenerator::ensureParametersValid()
+{
+    if (this->parameters_.blockSize < 0)
+    {
         throw std::runtime_error("Error: block size is less than zero.");
     }
 
-    if (this->parameters_.blockSize % 2 == 0) {
+    if (this->parameters_.blockSize % 2 == 0)
+    {
         throw std::runtime_error("Error: block size is not odd.");
     }
 
-    if (this->parameters_.leftScanSteps < 0) {
+    if (this->parameters_.leftScanSteps < 0)
+    {
         throw std::runtime_error("Error: left scan steps is negative.");
     }
 
-    if (this->parameters_.rightScanSteps < 0) {
+    if (this->parameters_.rightScanSteps < 0)
+    {
         throw std::runtime_error("Error: right scan steps is negative.");
     }
 }
 
 float OpenMpThreadedDisparityMapGenerator::computeDisparityForPixel(
-        int y, 
-        int x,
-        const cv::Mat& leftImage,
-        const cv::Mat& rightImage) {
+    int y,
+    int x,
+    const cv::Mat &leftImage,
+    const cv::Mat &rightImage)
+{
 
     float localDisparityBuf[512];
     int maxBlockStep = (this->parameters_.blockSize - 1) / 2;
@@ -85,7 +105,8 @@ float OpenMpThreadedDisparityMapGenerator::computeDisparityForPixel(
     // but is slower than parallelizing on the center pixel level
     // #pragma omp parallel for
     // #pragma omp simd
-    for (int xx = rightMinStartX; xx <= rightMaxStartX; xx++) {
+    for (int xx = rightMinStartX; xx <= rightMaxStartX; xx++)
+    {
         int sad = computeSadOverBlock(
             leftMinY,
             leftMinX,
@@ -93,43 +114,43 @@ float OpenMpThreadedDisparityMapGenerator::computeDisparityForPixel(
             xx,
             templateWidth,
             templateHeight,
-            leftImage, 
+            leftImage,
             rightImage);
 
         localDisparityBuf[xx - rightMinStartX] = sad;
 
-        if (sad < bestSadValue) {
+        if (sad < bestSadValue)
+        {
             bestSadValue = sad;
             bestIndex = xx - rightMinStartX;
         }
     }
 
     float disparity = static_cast<float>(std::abs(bestIndex - zeroDisparityIndex));
-    if ((bestIndex == 0)
-        ||
-        (bestIndex == numSteps)
-        ||
-        (bestSadValue == 0)) {
+    if ((bestIndex == 0) ||
+        (bestIndex == numSteps) ||
+        (bestSadValue == 0))
+    {
         return disparity;
     }
 
-    float c3 = localDisparityBuf[bestIndex+1];
+    float c3 = localDisparityBuf[bestIndex + 1];
     float c2 = localDisparityBuf[bestIndex];
-    float c1 = localDisparityBuf[bestIndex-1];
+    float c1 = localDisparityBuf[bestIndex - 1];
 
-    return disparity - (0.5 * ((c3 - c1) / (c1 - (2*c2) + c3)));
+    return disparity - (0.5 * ((c3 - c1) / (c1 - (2 * c2) + c3)));
 }
 
 int OpenMpThreadedDisparityMapGenerator::computeSadOverBlock(
-        int minYL,
-        int minXL,
-        int minYR,
-        int minXR,
-        int width,
-        int height,
-        const cv::Mat& leftImage,
-        const cv::Mat& rightImage) {
-
+    int minYL,
+    int minXL,
+    int minYR,
+    int minXR,
+    int width,
+    int height,
+    const cv::Mat &leftImage,
+    const cv::Mat &rightImage)
+{
     int sum = 0;
 
     // Parallelizing here is super slow for two reasons:
@@ -138,11 +159,12 @@ int OpenMpThreadedDisparityMapGenerator::computeSadOverBlock(
     // 3) Each iteration of the loop is quick. More time is spent waiting for threads to start.
     // #pragma omp parallel for collapse(2) reduction(+:sum)
     // #pragma omp simd collapse(2) reduction(+:sum)
-    for (int y = 0; y < height; y++) {
-        for (int x = 0; x < width; x++) {
+    for (int y = 0; y < height; y++)
+    {
+        for (int x = 0; x < width; x++)
+        {
             sum += std::abs(
-                leftImage.at<unsigned char>(y + minYL, x + minXL)
-                - rightImage.at<unsigned char>(y + minYR, x + minXR));
+                leftImage.at<unsigned char>(y + minYL, x + minXL) - rightImage.at<unsigned char>(y + minYR, x + minXR));
         }
     }
 

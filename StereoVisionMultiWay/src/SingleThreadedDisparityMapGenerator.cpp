@@ -1,29 +1,42 @@
 #include "../include/SingleThreadedDisparityMapGenerator.hpp"
+#include <iostream>
+
+// long long sumSADoverBlockAverageTime = 0;
 
 SingleThreadedDisparityMapGenerator::SingleThreadedDisparityMapGenerator(
-        const DisparityMapAlgorithmParameters_t& parameters)
-        : parameters_(parameters) {
+    const DisparityMapAlgorithmParameters_t &parameters)
+    : parameters_(parameters)
+{
     this->ensureParametersValid();
     this->disparityBuf_.resize(this->parameters_.rightScanSteps + this->parameters_.leftScanSteps + 1, 0);
 }
 
 void SingleThreadedDisparityMapGenerator::setParameters(
-        const DisparityMapAlgorithmParameters_t& parameters) {
+    const DisparityMapAlgorithmParameters_t &parameters)
+{
     this->parameters_ = parameters;
     this->ensureParametersValid();
     this->disparityBuf_.resize(this->parameters_.rightScanSteps + this->parameters_.leftScanSteps + 1, 0);
 }
 
-const DisparityMapAlgorithmParameters_t& SingleThreadedDisparityMapGenerator::getParameters() const {
+const DisparityMapAlgorithmParameters_t &SingleThreadedDisparityMapGenerator::getParameters() const
+{
     return this->parameters_;
 }
 
 void SingleThreadedDisparityMapGenerator::computeDisparity(
-        const cv::Mat& leftImage,
-        const cv::Mat& rightImage,
-        cv::Mat& disparity) {
-    for (int y = 0; y < disparity.rows; y++) {
-        for (int x = 0; x < disparity.cols; x++) {
+    const cv::Mat &leftImage,
+    const cv::Mat &rightImage,
+    cv::Mat &disparity)
+{
+    // // measure time
+    // long long sumElapsedTimePixel = 0;
+    // auto startTime = std::chrono::high_resolution_clock::now();
+    for (int y = 0; y < disparity.rows; y++)
+    {
+        for (int x = 0; x < disparity.cols; x++)
+        {
+
             disparity.at<float>(y, x) = computeDisparityForPixel(
                 y,
                 x,
@@ -31,31 +44,43 @@ void SingleThreadedDisparityMapGenerator::computeDisparity(
                 rightImage);
         }
     }
+
+    // sumElapsedTimePixel = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - startTime).count();
+    // long long totalPixels = disparity.rows * disparity.cols;
+    // double averageElapsedTimePixel = static_cast<double>(sumElapsedTimePixel) / totalPixels;
+    // std::cout << "Average time per pixel: " << averageElapsedTimePixel << " ns" << std::endl;
+    // std::cout << "Average SAD over block time: " << sumSADoverBlockAverageTime / totalPixels << " ns\n";
 }
 
-void SingleThreadedDisparityMapGenerator::ensureParametersValid() {
-    if (this->parameters_.blockSize < 0) {
+void SingleThreadedDisparityMapGenerator::ensureParametersValid()
+{
+    if (this->parameters_.blockSize < 0)
+    {
         throw std::runtime_error("Error: block size is less than zero.");
     }
 
-    if (this->parameters_.blockSize % 2 == 0) {
+    if (this->parameters_.blockSize % 2 == 0)
+    {
         throw std::runtime_error("Error: block size is not odd.");
     }
 
-    if (this->parameters_.leftScanSteps < 0) {
+    if (this->parameters_.leftScanSteps < 0)
+    {
         throw std::runtime_error("Error: left scan steps is negative.");
     }
 
-    if (this->parameters_.rightScanSteps < 0) {
+    if (this->parameters_.rightScanSteps < 0)
+    {
         throw std::runtime_error("Error: right scan steps is negative.");
     }
 }
 
 float SingleThreadedDisparityMapGenerator::computeDisparityForPixel(
-        int y, 
-        int x,
-        const cv::Mat& leftImage,
-        const cv::Mat& rightImage) {
+    int y,
+    int x,
+    const cv::Mat &leftImage,
+    const cv::Mat &rightImage)
+{
 
     int maxBlockStep = (this->parameters_.blockSize - 1) / 2;
 
@@ -79,7 +104,8 @@ float SingleThreadedDisparityMapGenerator::computeDisparityForPixel(
     int bestSadValue = std::numeric_limits<int>::max();
     int zeroDisparityIndex = x - rightMinStartX - templateLeftHalfWidth;
 
-    for (int xx = rightMinStartX; xx <= rightMaxStartX; xx++) {
+    for (int xx = rightMinStartX; xx <= rightMaxStartX; xx++)
+    {
         int sad = computeSadOverBlock(
             leftMinY,
             leftMinX,
@@ -87,51 +113,58 @@ float SingleThreadedDisparityMapGenerator::computeDisparityForPixel(
             xx,
             templateWidth,
             templateHeight,
-            leftImage, 
+            leftImage,
             rightImage);
 
         this->disparityBuf_[xx - rightMinStartX] = sad;
 
-        if (sad < bestSadValue) {
+        if (sad < bestSadValue)
+        {
             bestSadValue = sad;
             bestIndex = xx - rightMinStartX;
         }
     }
 
     float disparity = static_cast<float>(std::abs(bestIndex - zeroDisparityIndex));
-    if ((bestIndex == 0)
-        ||
-        (bestIndex == numSteps)
-        ||
-        (bestSadValue == 0)) {
+    if ((bestIndex == 0) ||
+        (bestIndex == numSteps) ||
+        (bestSadValue == 0))
+    {
         return disparity;
     }
 
-    float c3 = disparityBuf_[bestIndex+1];
+    float c3 = disparityBuf_[bestIndex + 1];
     float c2 = disparityBuf_[bestIndex];
-    float c1 = disparityBuf_[bestIndex-1];
+    float c1 = disparityBuf_[bestIndex - 1];
 
-    return disparity - (0.5 * ((c3 - c1) / (c1 - (2*c2) + c3)));
+    return disparity - (0.5 * ((c3 - c1) / (c1 - (2 * c2) + c3)));
 }
 
 int SingleThreadedDisparityMapGenerator::computeSadOverBlock(
-        int minYL,
-        int minXL,
-        int minYR,
-        int minXR,
-        int width,
-        int height,
-        const cv::Mat& leftImage,
-        const cv::Mat& rightImage) {
+    int minYL,
+    int minXL,
+    int minYR,
+    int minXR,
+    int width,
+    int height,
+    const cv::Mat &leftImage,
+    const cv::Mat &rightImage)
+{
 
+    // auto startTime = std::chrono::high_resolution_clock::now();
     int sum = 0;
-    for (int y = 0; y < height; y++) {
-        for (int x = 0; x < width; x++) {
+    for (int y = 0; y < height; y++)
+    {
+        for (int x = 0; x < width; x++)
+        {
             sum += std::abs(
-                leftImage.at<unsigned char>(y + minYL, x + minXL)
-                - rightImage.at<unsigned char>(y + minYR, x + minXR));
+                leftImage.at<unsigned char>(y + minYL, x + minXL) - rightImage.at<unsigned char>(y + minYR, x + minXR));
         }
     }
+
+    // auto endTime = std::chrono::high_resolution_clock::now();
+    // auto elapsedTime = std::chrono::duration_cast<std::chrono::nanoseconds>(endTime - startTime).count();
+    // sumSADoverBlockAverageTime += elapsedTime;
 
     return sum;
 }

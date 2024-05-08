@@ -1,6 +1,6 @@
-#include "../include/CudaFunctions.h"
+#include "../include/CudaSimdFunctions.h"
 
-__device__ void computeSadOverBlockCuda(
+__device__ void computeSadOverBlockCudaSimd(
     int minYL,
     int minXL,
     int minYR,
@@ -12,13 +12,33 @@ __device__ void computeSadOverBlockCuda(
     const uint8_t *rightImageData,
     int *sum)
 {
-
     *sum = 0;
+    int numStrides = width / 4;
     for (int y = 0; y < height; y++)
     {
-        for (int x = 0; x < width; x++)
+        for (int n = 0; n < numStrides; n++)
         {
-            // __usad(a, b, c) = |a-b| + c
+            int leftBaseIdx = ((y + minYL) * imageWidth) + minXL + (n * 4);
+            int rightBaseIdx = ((y + minYR) * imageWidth) + minXR + (n * 4);
+
+            uint32_t leftVal =
+                (leftImageData[leftBaseIdx + 3] << 24) |
+                (leftImageData[leftBaseIdx + 2] << 16) |
+                (leftImageData[leftBaseIdx + 1] << 8) |
+                (leftImageData[leftBaseIdx + 0]);
+
+            uint32_t rightVal =
+                (rightImageData[rightBaseIdx + 3] << 24) |
+                (rightImageData[rightBaseIdx + 2] << 16) |
+                (rightImageData[rightBaseIdx + 1] << 8) |
+                (rightImageData[rightBaseIdx + 0]);
+
+            *sum += __vsadu4(leftVal, rightVal);
+        }
+
+        for (int x = numStrides * 4; x < width; x++)
+        {
+            //__usad(a, b, c) = |a-b| + c
             *sum += __usad(
                 leftImageData[((y + minYL) * imageWidth) + (x + minXL)],
                 rightImageData[((y + minYR) * imageWidth) + (x + minXR)],
@@ -27,7 +47,7 @@ __device__ void computeSadOverBlockCuda(
     }
 }
 
-__device__ void computeDisparityForPixelCuda(
+__device__ void computeDisparityForPixelCudaSimd(
     int y,
     int x,
     int imageWidth,
@@ -66,7 +86,7 @@ __device__ void computeDisparityForPixelCuda(
     for (int xx = rightMinStartX; xx <= rightMaxStartX; xx++)
     {
         int sad = 0;
-        computeSadOverBlockCuda(
+        computeSadOverBlockCudaSimd(
             leftMinY,
             leftMinX,
             leftMinY, // Ys are aligned for the two images
@@ -104,7 +124,7 @@ __device__ void computeDisparityForPixelCuda(
     }
 }
 
-__global__ void computeDisparityCudaInternal(
+__global__ void computeDisparityCudaInternalSimd(
     int height,
     int width,
     int blockSize,
@@ -123,7 +143,7 @@ __global__ void computeDisparityCudaInternal(
         int y = i / width;
         int x = i % width;
 
-        computeDisparityForPixelCuda(
+        computeDisparityForPixelCudaSimd(
             y,
             x,
             width,
@@ -141,7 +161,7 @@ static uint8_t *leftCudaData = NULL;
 static uint8_t *rightCudaData = NULL;
 static float *disparityCudaData = NULL;
 
-void destroyCudaMemoryBuffers()
+void destroyCudaMemoryBuffersSimd()
 {
     if (leftCudaData != NULL)
     {
@@ -162,7 +182,7 @@ void destroyCudaMemoryBuffers()
     }
 }
 
-void computeDisparityCuda(
+void computeDisparityCudaSimd(
     int imageHeight,
     int imageWidth,
     int blockSize,
@@ -187,7 +207,16 @@ void computeDisparityCuda(
 
     int numThreads = 256;
     int numBlocks = ceil(((float)numElements) / ((float)numThreads));
-    computeDisparityCudaInternal<<<numBlocks, numThreads>>>(
+
+    // Create CUDA events
+    cudaEvent_t start, stop;
+    cudaEventCreate(&start);
+    cudaEventCreate(&stop);
+
+    // Record the start event
+    cudaEventRecord(start, NULL);
+
+    computeDisparityCudaInternalSimd<<<numBlocks, numThreads>>>(
         imageHeight,
         imageWidth,
         blockSize,
@@ -199,5 +228,24 @@ void computeDisparityCuda(
 
     cudaDeviceSynchronize();
 
+    // Record the stop event
+    cudaEventRecord(stop, NULL);
+    cudaEventSynchronize(stop);
+
+    float milliseconds = 0;
+    cudaEventElapsedTime(&milliseconds, start, stop);
+
+    // Convert to nanoseconds
+    float nanoseconds = milliseconds * 1000000;
+
+    // Compute time per pixel
+    float timePerPixel = nanoseconds / numElements;
+
+    printf("Time per pixel: %f ns\n", timePerPixel);
+
     cudaMemcpy(disparityData, disparityCudaData, numElements * sizeof(float), cudaMemcpyDeviceToHost);
+
+    // Destroy the CUDA events
+    cudaEventDestroy(start);
+    cudaEventDestroy(stop);
 }

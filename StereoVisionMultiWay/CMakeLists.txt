@@ -3,7 +3,7 @@ set(CMAKE_C_COMPILER "/usr/bin/clang")
 set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
 project(StereoVisionMultiWay LANGUAGES C CXX CUDA)
 enable_language(CUDA)
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED YES)
 
 # This is set separately because nvcc doesn't understand these flags

@@ -58,8 +58,8 @@ int main(int argc, char **argv)
     templateParameters.blockSize = parser.get<int>("blockSize");
     templateParameters.leftScanSteps = parser.get<int>("leftScanSteps");
     templateParameters.rightScanSteps = parser.get<int>("rightScanSteps");
-    templateParameters.leftImageFilePath = "./left.png";
-    templateParameters.rightImageFilePath = "./right.png";
+    templateParameters.leftImageFilePath = parser.get<cv::String>("leftImage");
+    templateParameters.rightImageFilePath = parser.get<cv::String>("rightImage");
     templateParameters.outputPath = std::string(parser.get<cv::String>("outputPath"));
     std::string algorithmNamesStr = "SingleThreaded,SingleThreadedSimd,OpenMP,OpenMPSimd,CUDA,CUDASimd";
     int numIterations = parser.get<int>("numIterations");

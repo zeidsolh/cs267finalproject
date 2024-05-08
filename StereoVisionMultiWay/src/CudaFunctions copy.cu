@@ -187,6 +187,15 @@ void computeDisparityCuda(
 
     int numThreads = 256;
     int numBlocks = ceil(((float)numElements) / ((float)numThreads));
+
+    // Create CUDA events
+    cudaEvent_t start, stop;
+    cudaEventCreate(&start);
+    cudaEventCreate(&stop);
+
+    // Record the start event
+    cudaEventRecord(start, NULL);
+
     computeDisparityCudaInternal<<<numBlocks, numThreads>>>(
         imageHeight,
         imageWidth,
@@ -199,5 +208,22 @@ void computeDisparityCuda(
 
     cudaDeviceSynchronize();
 
+    // Record the stop event
+    cudaEventRecord(stop, NULL);
+    cudaEventSynchronize(stop);
+
+    float milliseconds = 0;
+    cudaEventElapsedTime(&milliseconds, start, stop);
+    float nanoseconds = milliseconds * 1000000;
+
+    // Compute time per pixel
+    float timePerPixel = nanoseconds / numElements;
+
+    printf("Time per pixel: %f ns\n", timePerPixel);
+
     cudaMemcpy(disparityData, disparityCudaData, numElements * sizeof(float), cudaMemcpyDeviceToHost);
+
+    // Destroy the CUDA events
+    cudaEventDestroy(start);
+    cudaEventDestroy(stop);
 }
